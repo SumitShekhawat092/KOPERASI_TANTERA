@@ -1,0 +1,63 @@
+﻿@model KOPERASI_TANTERA.Web.Models.Registration.StepOneModel 
+
+<h1>Create Account</h1>
+
+<h4>Hello Let's get your account set</h4>
+
+<div class="container border">
+    <form asp-controller="Registration" asp-action="step-one" id="form1" method="post">
+            <div class="text-danger" asp-validation-summary="All"></div>
+
+            <div class="mb-3 row">
+                <div class="col-2">
+                    <label asp-for="CustomerName"></label>
+                </div>
+                <div class="col-5">
+                <input type="text" asp-for="CustomerName" name="CustomerName" id="CustomerName" />
+                    <span asp-validation-for="CustomerName"></span>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <div class="col-2">
+                    <label asp-for="ICNumber"></label>
+                </div>
+                <div class="col-5">
+                <input type="text" asp-for="ICNumber" id="ICNumber" name="ICNumber" />
+                    <span asp-validation-for="ICNumber"></span>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <div class="col-2">
+                    <label asp-for="MobileNumber"></label>
+                </div>
+                <div class="col-5">
+                <input type="text" asp-for="MobileNumber" id="MobileNumber" name="MobileNumber" />
+                    <span asp-validation-for="MobileNumber"></span>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <div class="col-2">
+                    <label asp-for="EmailAddress"></label>
+                </div>
+                <div class="col-5">
+                <input type="text" asp-for="EmailAddress" id="EmailAddress" name="EmailAddress" />
+                    <span asp-validation-for="EmailAddress"></span>
+                </div>
+            </div>
+
+            <div class="mb-3 row">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

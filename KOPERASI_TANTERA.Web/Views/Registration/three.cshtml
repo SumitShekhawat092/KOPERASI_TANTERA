@@ -1,0 +1,82 @@
+﻿@{
+    ViewData["Title"] = "Create & Confirm PIN";
+}
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
+        <h4 class="text-center mb-3">Please create your 6-digit PIN</h4>
+        <p class="text-muted text-center mb-4">
+            You can login using the PIN and authenticate any account activity.
+        </p>
+
+        <form asp-controller="Registration" asp-action="step-three" id="form3" method="post" method="post">
+            <!-- Create PIN -->
+            <div class="mb-3">
+                <label class="form-label">Enter PIN</label>
+                <div class="d-flex justify-content-between">
+                    @for (int i = 0; i < 6; i++)
+                    {
+                        <input type="password" maxlength="1" class="form-control text-center mx-1 pin-input pin-create" id="pin" name="pin" style="width: 45px; font-size: 1.5rem;" required />
+                    }
+                </div>
+            </div>
+
+            <!-- Confirm PIN -->
+            <div class="mb-3">
+                <label class="form-label">Confirm PIN</label>
+                <div class="d-flex justify-content-between">
+                    @for (int i = 0; i < 6; i++)
+                    {
+                        <input type="password" maxlength="1" class="form-control text-center mx-1 pin-input pin-confirm" id="confirm" name="confirm" style="width: 45px; font-size: 1.5rem;" required />
+                    }
+                </div>
+            </div>
+
+            <div class="text-danger text-center mb-3" id="pinMismatch" style="display: none;">
+                PINs do not match. Please try again.
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100" id="nextBtn" disabled>NEXT</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const createInputs = document.querySelectorAll('.pin-create');
+        const confirmInputs = document.querySelectorAll('.pin-confirm');
+        const allInputs = document.querySelectorAll('.pin-input');
+        const nextBtn = document.getElementById('nextBtn');
+        const mismatchMsg = document.getElementById('pinMismatch');
+
+        allInputs.forEach((input, index, inputs) => {
+            input.addEventListener('input', () => {
+                if (input.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+                validatePins();
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && input.value === '' && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+
+        function getPinValues(inputList) {
+            return Array.from(inputList).map(i => i.value).join('');
+        }
+
+        function validatePins() {
+            const pin1 = getPinValues(createInputs);
+            const pin2 = getPinValues(confirmInputs);
+
+            const allFilled = pin1.length === 6 && pin2.length === 6;
+            const match = pin1 === pin2;
+
+            nextBtn.disabled = !(allFilled && match);
+            mismatchMsg.style.display = (allFilled && !match) ? 'block' : 'none';
+        }
+    </script>
+}
