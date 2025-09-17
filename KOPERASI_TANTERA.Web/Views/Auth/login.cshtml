@@ -1,0 +1,43 @@
+﻿@model KOPERASI_TANTERA.Web.Models.Auth.CredentialViewModel
+
+<h1>Create Account</h1>
+
+<h4>Hello Let's get your account set</h4>
+
+<div class="container border">
+    <form asp-controller="Auth" asp-action="one" id="form1" method="post">
+        <div class="text-danger" asp-validation-summary="All"></div>
+
+        <div class="mb-3 row">
+            <div class="col-2">
+                <label asp-for="Email"></label>
+            </div>
+            <div class="col-5">
+                <input type="text" asp-for="Email" name="Email" id="Email" />
+                <span asp-validation-for="Email"></span>
+            </div>
+        </div>
+
+        <div class="mb-3 row">
+            <div class="col-2">
+                <label asp-for="Password"></label>
+            </div>
+            <div class="col-5">
+                <input type="password" asp-for="Password" id="password" name="password" />
+                <span asp-validation-for="Password"></span>
+            </div>
+        </div>
+
+        <div class="mb-3 row">
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

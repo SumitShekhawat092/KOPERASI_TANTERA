@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
-namespace KOPERASI_TANTERA.Web.Models.Registration
+namespace KOPERASI_TANTERA.Web.Models.Auth
 {
     public class StepOneModel
     {
@@ -18,5 +18,6 @@ namespace KOPERASI_TANTERA.Web.Models.Registration
         [EmailAddress]
         [StringLength(250)]
         public string EmailAddress { get; set; } = string.Empty;
+        public string PasswordPIN { get; set; } = string.Empty;
     }
 }

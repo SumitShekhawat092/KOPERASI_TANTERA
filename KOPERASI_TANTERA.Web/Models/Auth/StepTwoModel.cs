@@ -1,4 +1,4 @@
-﻿namespace KOPERASI_TANTERA.Web.Models.Registration
+﻿namespace KOPERASI_TANTERA.Web.Models.Auth
 {
     public class StepTwoModel
     {

@@ -1,4 +1,4 @@
-﻿@model KOPERASI_TANTERA.Web.Models.Registration.StepTwoModel
+﻿@model KOPERASI_TANTERA.Web.Models.Auth.StepTwoModel
 @{
     ViewBag.Title = "Terms and Conditions";
 }
@@ -6,7 +6,7 @@
 <div class="container py-5">
     <h2 class="mb-4 text-center">Terms and Conditions</h2>
 
-    <form asp-controller="Registration" asp-action="two" id="form2" method="post">
+    <form asp-controller="auth" asp-action="two" id="form2" method="post">
         <div class="card mb-4">
             <div class="card-body" style="max-height: 300px; overflow-y: auto;">
                 <p>Welcome to our platform. By accessing or using our services, you agree to be bound by the following terms and conditions. Please read them carefully.</p>

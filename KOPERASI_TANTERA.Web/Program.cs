@@ -1,4 +1,7 @@
 using KOPERASI_TANTERA.Web.Data;
+using KOPERASI_TANTERA.Web.Models.Entities;
+using KOPERASI_TANTERA.Web.Models.Repository;
+using KOPERASI_TANTERA.Web.Models.Repository.Contract;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,9 +24,21 @@ string connection = builder.Configuration.GetConnectionString("DefaultConnection
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connection));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentity<Member, IdentityRole>(options => {
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequiredUniqueChars = 1;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>();
 
-
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/auth/login";
+    options.AccessDeniedPath = "/auth/access-denied";
+});
 
 string secret = builder.Configuration["SecretKey"] ?? string.Empty;
 builder.Services.AddAuthentication(options => {
@@ -43,6 +58,10 @@ builder.Services.AddAuthentication(options => {
         ClockSkew = TimeSpan.Zero
     };
 });
+
+builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+
+
 
 var app = builder.Build();
 
