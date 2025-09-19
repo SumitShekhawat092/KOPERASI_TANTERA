@@ -1,13 +1,15 @@
 ﻿using KOPERASI_TANTERA.Web.Models.Auth;
 using KOPERASI_TANTERA.Web.Models.Entities;
 using KOPERASI_TANTERA.Web.Models.Repository.Contract;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Security.Claims;
 
 namespace KOPERASI_TANTERA.Web.Controllers
 {
-    [Route("[controller]/register/")]
+    [Route("[controller]")]
     public class AuthController : Controller
     {
         private readonly IMemberRepository _memberRepository;
@@ -19,7 +21,7 @@ namespace KOPERASI_TANTERA.Web.Controllers
             _signInManager = signInManager;
         }
 
-        [Route("take-a-few-minutes")]
+        [Route("register/take-a-few-minutes")]
         public IActionResult Index()
         {
             return View();
@@ -28,14 +30,14 @@ namespace KOPERASI_TANTERA.Web.Controllers
         #region step-one
 
         [HttpGet]
-        [Route("step-one")]
+        [Route("register/step-one")]
         public IActionResult one()
         {
             StepOneModel steponemodel = new StepOneModel();
             return View(steponemodel);
         }
         [HttpPost]
-        [Route("step-one")]
+        [Route("register/step-one")]
         public IActionResult one(StepOneModel model)
         {
             if (!ModelState.IsValid)
@@ -51,7 +53,7 @@ namespace KOPERASI_TANTERA.Web.Controllers
         #region step-two
 
         [HttpGet]
-        [Route("step-two")]
+        [Route("register/step-two")]
         public IActionResult two()
         {
             string jsonData = HttpContext.Session.GetString("stepone_data") ?? string.Empty;
@@ -67,7 +69,7 @@ namespace KOPERASI_TANTERA.Web.Controllers
         }
 
         [HttpPost]
-        [Route("step-two")]
+        [Route("register/step-two")]
         public IActionResult two(StepTwoModel model)
         {
             if (ModelState.IsValid)
@@ -82,16 +84,17 @@ namespace KOPERASI_TANTERA.Web.Controllers
         #endregion
 
         #region step-three
-        [HttpGet("step-three")]
+        [HttpGet]
+        [Route("register/step-three")]
         public IActionResult three()
         {
             return View();
         }
 
-        [HttpPost("step-three")]
+        [HttpPost]
+        [Route("register/step-three")]
         public async Task<IActionResult> threeAsync(string[] pin, string[] confirm)
         {
-            //if(!ModelState.IsValid)
             var IsConfirm = pin.SequenceEqual(confirm);
             if (!IsConfirm)
             {
@@ -112,8 +115,19 @@ namespace KOPERASI_TANTERA.Web.Controllers
                 var resultModel = await _memberRepository.RegisterMember(steponeModel);
                 if (resultModel.Succeeded)
                 {
-                    //return RedirectToAction("/Dashboard/Index");
-                    return RedirectToAction("index", "Dashboard", new { area = "Member" });
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name,steponeModel.EmailAddress),
+                        new Claim(ClaimTypes.Email,steponeModel.EmailAddress),
+                        new Claim("User","true")
+                    };
+                    var claimIdentity = new ClaimsIdentity(claims, "MyCookieAuth");
+                    var claimsPrinciple = new ClaimsPrincipal(claimIdentity);
+
+                    await HttpContext.SignInAsync("MyCookieAuth", claimsPrinciple);
+
+                    // Redirect to Dashboard
+                    return RedirectToAction("index", "Dashboard", new { area = "member" });
                 }
                 else
                 {
@@ -130,16 +144,20 @@ namespace KOPERASI_TANTERA.Web.Controllers
 
         #endregion
 
-        [HttpGet("login")]
+        [HttpGet]
+        [Route("login")]
         public IActionResult login()
         {
             return View();
         }
 
-        [HttpGet("login")]
-        public async Task<IActionResult> LoginAsync(CredentialViewModel credentialViewModel)
+        [HttpPost]
+        [Route("login")]
+        public async Task<IActionResult> LoginAsync(CredentialViewModel credentialViewModel, string returnUrl = null)
         {
-            if (!ModelState.IsValid)
+            returnUrl ??= Url.Content("~/Member/Dashboard");
+
+            if (ModelState.IsValid)
             {
                 var result = await _signInManager.PasswordSignInAsync(
                     credentialViewModel.Email,
@@ -149,9 +167,18 @@ namespace KOPERASI_TANTERA.Web.Controllers
                 if (result.Succeeded)
                 {
                     // Assign Claims here for Authorization
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name,credentialViewModel.Email),
+                        new Claim(ClaimTypes.Email,credentialViewModel.Email),
+                        new Claim("User","true")
+                    };
+                    var claimIdentity = new ClaimsIdentity(claims, "MyCookieAuth");
+                    var claimsPrinciple = new ClaimsPrincipal(claimIdentity);
 
-                    // Redirect to Dashboard
-                    return RedirectToAction("index", "Dashboard", new { area = "member" });
+                    await HttpContext.SignInAsync("MyCookieAuth", claimsPrinciple);
+
+                    return LocalRedirect(returnUrl);
                 }
                 else
                 {
@@ -161,7 +188,8 @@ namespace KOPERASI_TANTERA.Web.Controllers
             return View(credentialViewModel);
         }
 
-        [HttpGet("access-denied")]
+        [HttpGet]
+        [Route("access-denied")]
         public IActionResult AccessDenied()
         {
 
