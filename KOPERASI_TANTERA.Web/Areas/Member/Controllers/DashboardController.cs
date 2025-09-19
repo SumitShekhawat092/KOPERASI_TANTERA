@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KOPERASI_TANTERA.Web.Areas.Member.Controllers
 {
-    [Area("Member")]
     [Authorize]
+    [Area("Member")]
     public class DashboardController : Controller
     {
         [HttpGet]

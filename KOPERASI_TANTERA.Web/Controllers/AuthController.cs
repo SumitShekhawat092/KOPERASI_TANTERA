@@ -2,6 +2,7 @@
 using KOPERASI_TANTERA.Web.Models.Entities;
 using KOPERASI_TANTERA.Web.Models.Repository.Contract;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -115,19 +116,27 @@ namespace KOPERASI_TANTERA.Web.Controllers
                 var resultModel = await _memberRepository.RegisterMember(steponeModel);
                 if (resultModel.Succeeded)
                 {
-                    var claims = new List<Claim>
+                    var result = await _signInManager.PasswordSignInAsync(
+                    steponeModel.EmailAddress,
+                    steponeModel.PasswordPIN,
+                    false,
+                    false);
+                    if (result.Succeeded)
                     {
-                        new Claim(ClaimTypes.Name,steponeModel.EmailAddress),
-                        new Claim(ClaimTypes.Email,steponeModel.EmailAddress),
-                        new Claim("User","true")
-                    };
-                    var claimIdentity = new ClaimsIdentity(claims, "MyCookieAuth");
-                    var claimsPrinciple = new ClaimsPrincipal(claimIdentity);
+                        // Assign Claims here for Authorization
+                        var claims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Name,steponeModel.EmailAddress),
+                            new Claim(ClaimTypes.Email,steponeModel.EmailAddress),
+                            new Claim("User","true")
+                        };
+                        var claimIdentity = new ClaimsIdentity(claims, "MyCookieAuth");
+                        var claimsPrinciple = new ClaimsPrincipal(claimIdentity);
 
-                    await HttpContext.SignInAsync("MyCookieAuth", claimsPrinciple);
+                        await HttpContext.SignInAsync("MyCookieAuth", claimsPrinciple);
 
-                    // Redirect to Dashboard
-                    return RedirectToAction("index", "Dashboard", new { area = "member" });
+                        return LocalRedirect(Url.Content("~/Member/Dashboard"));
+                    }
                 }
                 else
                 {
@@ -148,6 +157,8 @@ namespace KOPERASI_TANTERA.Web.Controllers
         [Route("login")]
         public IActionResult login()
         {
+            if (User.Identity is not null && User.Identity.IsAuthenticated)
+                return LocalRedirect(Url.Content("~/Member/Dashboard"));
             return View();
         }
 
@@ -186,6 +197,15 @@ namespace KOPERASI_TANTERA.Web.Controllers
                 }
             }
             return View(credentialViewModel);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("logout")]
+        public async Task<IActionResult> LogoutAsync()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("index","home");
         }
 
         [HttpGet]

@@ -1,8 +1,6 @@
 ﻿@model KOPERASI_TANTERA.Web.Models.Auth.CredentialViewModel
 
-<h1>Create Account</h1>
-
-<h4>Hello Let's get your account set</h4>
+<h1>Login Page</h1>
 
 <div class="container border">
     <form asp-controller="Auth" asp-action="Login" id="form1" method="post">
@@ -20,7 +18,7 @@
 
         <div class="mb-3 row">
             <div class="col-2">
-                <label asp-for="Password"></label>
+                <label asp-for="Password">PIN</label>
             </div>
             <div class="col-5">
                 <input type="password" asp-for="Password" id="password" name="password" />

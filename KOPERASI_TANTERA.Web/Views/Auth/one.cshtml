@@ -2,8 +2,6 @@
 
 <h1>Create Account</h1>
 
-<h4>Hello Let's get your account set</h4>
-
 <div class="container border">
     <form asp-controller="Auth" asp-action="one" id="form1" method="post">
             <div class="text-danger" asp-validation-summary="All"></div>
@@ -23,7 +21,7 @@
                     <label asp-for="ICNumber"></label>
                 </div>
                 <div class="col-5">
-                <input type="text" asp-for="ICNumber" id="ICNumber" name="ICNumber" />
+                <input type="text" asp-for="ICNumber" id="ICNumber" name="ICNumber" onkeypress="return isNumber(event)" />
                     <span asp-validation-for="ICNumber"></span>
                 </div>
             </div>
@@ -33,7 +31,7 @@
                     <label asp-for="MobileNumber"></label>
                 </div>
                 <div class="col-5">
-                <input type="text" asp-for="MobileNumber" id="MobileNumber" name="MobileNumber" />
+                <input type="text" asp-for="MobileNumber" id="MobileNumber" name="MobileNumber" onkeypress="return isNumber(event)" />
                     <span asp-validation-for="MobileNumber"></span>
                 </div>
             </div>
@@ -59,5 +57,15 @@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+        
     }
+    <script type="text/javascript">
+        function isNumber(evt) {
+            evt = (evt) ? evt : window.event;
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            if (charCode > 31 && (charCode < 48 || charCode > 57)) { return false; } 
+            return true;
+        }
+    </script>
 }
